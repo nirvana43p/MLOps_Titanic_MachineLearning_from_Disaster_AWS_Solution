@@ -29,7 +29,7 @@ aws_secret_access_key = "-"
 region_name = "-"
 
 # Execution role for SageMaker tasks
-role_execution = "-"
+role_execution = ""
 
 
 
