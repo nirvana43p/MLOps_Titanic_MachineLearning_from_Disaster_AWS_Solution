@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion : 2010-09-09
+
+
+Metadata:
+    AWS::CloudFormation::Interface:
+        ParameterGroups:
+            -
+                Label:
+                    default: 'Endpoint Random Forest Classifier'
+                Parameters:
+                    - EndpointName
+                    - EndpointConfigName
+            -
+                Label:
+                    default: 'Lambda Function invoke endpoint'
+                Parameters:
+                    - LambdaName
+                    - LambdaRuntime
+                    - LambdaBucket
+                    - ZipName
+            -
+                Label:
+                    default: "RestApi"
+                Parameters:
+                    - RestApiName
+
+        ParameterLabels:
+            EndpointName:
+                default: 'Enter the endpoint name'
+            EndpointConfigName:
+                default: 'Enter the endpoint config name'
+            LambdaName:
+                default: 'Enter the lambda function name'
+            LambdaRuntime:
+                default: 'Enter the lambda runtime'
+            LambdaBucket:
+                default: 'Enter the name of the bucket where the lambda code is'
+            ZipName:
+                default: 'Enter the name of the lambda .zip'
+            RestApiName:
+                default: "Enter the name of the rest API"
+
+
+Parameters:
+    EndpointName:
+        Type: String
+        Default: sklearn-rfCustom
+    EndpointConfigName:
+        Type: String
+        Default: sagemaker-scikit-learn-2022-08-08-23-03-36-920
+    LambdaName:
+        Type: String
+        Default: rfClassifier-sklearn-cloudFormation
+    LambdaRuntime:
+        Description: Runtime
+        Type: String
+        Default: python3.7
+        AllowedValues:
+            - python3.7
+            - python2.7
+    LambdaBucket:
+        Description: Bucket
+        Type: String
+        Default: rf-built-in-algorithm
+    ZipName:
+        Description: Zip
+        Type: String
+        Default: lambdaFunction/rfClassifier_lambda.zip
+    RestApiName:
+        Type: String
+        Default: MyRestApi
+
+
+Resources:
+
+    endpoint:
+        Type: "AWS::CloudFormation::Stack"
+        Properties:
+            TemplateURL: https://rf-built-in-algorithm.s3.amazonaws.com/ApiLambdaEndopoint_template/endpoint.yml
+            Parameters:
+                EndpointConfigName: !Ref EndpointConfigName
+                EndpointName : !Ref EndpointName
+
+    lambda:
+        Type: "AWS::CloudFormation::Stack"
+        DependsOn: endpoint
+        Properties:
+            TemplateURL: https://rf-built-in-algorithm.s3.amazonaws.com/ApiLambdaEndopoint_template/lambda.yml
+            Parameters:
+                LambdaName: !Ref LambdaName
+                LambdaRuntime: !Ref LambdaRuntime
+                LambdaBucket: !Ref LambdaBucket  
+                ZipName: !Ref ZipName  
+    
+    api:
+        Type: "AWS::CloudFormation::Stack"
+        DependsOn: lambda
+        Properties:
+            TemplateURL: https://rf-built-in-algorithm.s3.amazonaws.com/ApiLambdaEndopoint_template/api.yml     
+            Parameters:
+                LambdaFunction: !GetAtt lambda.Outputs.LambdaFunction
+                RestApiName: !Ref RestApiName     

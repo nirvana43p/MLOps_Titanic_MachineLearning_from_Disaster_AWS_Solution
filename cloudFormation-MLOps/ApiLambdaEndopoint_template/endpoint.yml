@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+
+Parameters:
+    EndpointName:
+        Type: String
+    EndpointConfigName:
+        Type: String
+      
+
+Resources:
+
+  endpoint:
+    Type: AWS::SageMaker::Endpoint
+    Properties:
+      EndpointConfigName: !Ref EndpointConfigName
+      EndpointName : !Ref EndpointName
+
+
+Outputs:
+  EndpointName:
+    Value: !GetAtt endpoint.EndpointName
+    Export:
+        Name: EndpointName
+

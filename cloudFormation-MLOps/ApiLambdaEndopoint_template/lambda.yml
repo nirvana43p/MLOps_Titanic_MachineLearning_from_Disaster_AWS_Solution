@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+
+Parameters:
+    LambdaName:
+        Type: String
+    LambdaRuntime:
+        Description: Runtime
+        Type: String
+    LambdaBucket:
+        Description: Bucket
+        Type: String
+    ZipName:
+        Description: Zip
+        Type: String
+      
+
+Resources:
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: LambdaRole
+    Properties:
+        Code:
+            S3Bucket: !Ref LambdaBucket
+            S3Key: !Ref ZipName
+        FunctionName: !Ref LambdaName
+        Handler: rfClassifier_lambda.lambda_handler
+        Runtime: !Ref LambdaRuntime
+        MemorySize: 512
+        Timeout: 600
+        Role: !GetAtt LambdaRole.Arn
+        Environment:
+            Variables:
+                ENDPOINT_NAME: !ImportValue EndpointName
+
+
+  LambdaPolicyCW:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+          PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                  -
+                    Effect: Allow
+                    Action:
+                        - logs:CreateLogGroup
+                        - logs:CreateLogStream
+                        - logs:PutLogEvents
+                    Resource:
+                        - "*"
+
+
+  LambdaPolicyEndpoint:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+          PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                  -
+                    Effect: Allow
+                    Action:
+                        - sagemaker:DescribeTrainingJob
+                        - sagemaker:DescribeLabelingJob
+                        - sagemaker:DescribeDataQualityJobDefinition
+                        - sagemaker:DescribeModelPackage
+                        - sagemaker:Search
+                        - sagemaker:DescribeModelPackageGroup
+                        - sagemaker:DescribeApp
+                        - sagemaker:GetRecord
+                        - sagemaker:DescribeFlowDefinition
+                        - sagemaker:DescribeAlgorithm
+                        - sagemaker:GetLineageGroupPolicy
+                        - sagemaker:DescribeTransformJob
+                        - sagemaker:DescribeInferenceRecommendationsJob
+                        - sagemaker:DescribeHumanLoop
+                        - sagemaker:BatchDescribeModelPackage
+                        - sagemaker:DescribeAction
+                        - sagemaker:DescribeDeviceFleet
+                        - sagemaker:DescribeSubscribedWorkteam
+                        - sagemaker:DescribeHyperParameterTuningJob
+                        - sagemaker:DescribeAutoMLJob
+                        - sagemaker:DescribeWorkforce
+                        - sagemaker:DescribeProcessingJob
+                        - sagemaker:GetDeviceFleetReport
+                        - sagemaker:DescribeEndpointConfig
+                        - sagemaker:DescribeStudioLifecycleConfig
+                        - sagemaker:RenderUiTemplate
+                        - sagemaker:DescribeImageVersion
+                        - sagemaker:BatchGetRecord
+                        - sagemaker:DescribeHumanTaskUi
+                        - sagemaker:GetDeviceRegistration
+                        - sagemaker:DescribeProject
+                        - sagemaker:Get-sagemakerServicecatalogPortfolioStatus
+                        - sagemaker:DescribeNotebookInstance
+                        - sagemaker:DescribeAppImageConfig
+                        - sagemaker:DescribeLineageGroup
+                        - sagemaker:DescribeNotebookInstanceLifecycleConfig
+                        - sagemaker:DescribeTrial
+                        - sagemaker:DescribeContext
+                        - sagemaker:DescribeModelExplainabilityJobDefinition
+                        - sagemaker:DescribeEndpoint
+                        - sagemaker:DescribeUserProfile
+                        - sagemaker:InvokeEndpoint
+                        - sagemaker:DescribeMonitoringSchedule
+                        - sagemaker:DescribeEdgePackagingJob
+                        - sagemaker:DescribeFeatureGroup
+                        - sagemaker:DescribeModelQualityJobDefinition
+                        - sagemaker:GetModelPackageGroupPolicy
+                        - sagemaker:DescribeModel
+                        - sagemaker:DescribePipeline
+                        - sagemaker:DescribeArtifact
+                        - sagemaker:DescribePipelineExecution
+                        - sagemaker:DescribeWorkteam
+                        - sagemaker:DescribeModelBiasJobDefinition
+                        - sagemaker:DescribeCompilationJob
+                        - sagemaker:BatchGetMetrics
+                        - sagemaker:GetSearchSuggestions
+                        - sagemaker:DescribeExperiment
+                        - sagemaker:DescribeImage
+                        - sagemaker:DescribeDomain
+                        - sagemaker:DescribeCodeRepository
+                        - sagemaker:InvokeEndpointAsync
+                        - sagemaker:DescribePipelineDefinitionForExecution
+                        - sagemaker:DescribeTrialComponent
+                        - sagemaker:DescribeDevice
+                    Resource:
+                        - "*"
+
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - !Ref LambdaPolicyEndpoint
+        - !Ref LambdaPolicyCW
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+
+
+Outputs:
+    LambdaFunction:
+        Value: !GetAtt LambdaFunction.Arn
+        Export:
+            Name: LambdaFunction
+
