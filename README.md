@@ -4,7 +4,7 @@
 
 ## Task
 
- Build a complete solution to train and deploy an ML model on Amazon Web Services (AWS).
+ Build a complete solution to train and deploy a ML model on Amazon Web Services (AWS).
 
 The services used were:
 
@@ -17,13 +17,13 @@ The services used were:
 
 ## Summary
 
-Cloud services have had a great impact on IT (information technology) in the last 10 years, due to the flexibility, scalability, reliability and security of their services. In this project, a complete architecture is proposed to train and deploy a Machine Learning model using AWS as a cloud provider. The model training was done by creating a job in SageMaker using a pre-built container Image (in this case, a scikit-learn image), and its deployment was done by creating an endpoint from a sagemaker configuration endpoint, a lambda function to preprocess the request and an API Gateway as a Rest API to expose the service to internet. The deployment infrastructure was automated with cloudFormation and the training infrastructure was automated with the python SDK.
+Cloud services have had a great impact on IT (information technology) in the last 10 years, due to the flexibility, scalability, reliability and security of their services. In this project, a complete architecture is proposed to train and deploy a Machine Learning model using AWS as a cloud provider. Model training was done by creating a job in SageMaker using a pre-built container image (in this case a scikit-learn image), its deployment was done by creating an endpoint from a sagemaker config endpoint, also defined a lambda function to preprocess the request and invoke the ML model. Finally, an API Gateway was defined as Rest API to expose the service to the internet. The deployment infrastructure was automated with cloudFormation and the training infrastructure was automated with the python SDK.
 
 ![](images/Proposal.png)
 
 ## Functionality
 
-use machine learning to create a model that predicts which passengers survived the Titanic shipwreck. This task is the toy task from kaggle for ML practitioners ( https://www.kaggle.com/c/titanic). A possible solution to this task (using a random forest classifier) is shown in the Titanic_Machine_Learning_from_Disaster.ipynb notebook. The hyperparameters and data pipeline are saved and used in the training stage. 
+Use machine learning to create a model that predicts which passengers survived the Titanic shipwreck. This task is the toy task from kaggle for ML practitioners ( https://www.kaggle.com/c/titanic). A possible solution to this task (using a random forest classifier) is shown in the Titanic_Machine_Learning_from_Disaster.ipynb notebook. The hyperparameters and data pipeline are saved and used in the training stage. 
 
 ### Training Stage
 
